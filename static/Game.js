@@ -1,23 +1,27 @@
-// Enhanced Tic-Tac-Toe with AI vs AI Mode
+// GameManager.js - Game State Management
 
-class TicTacToe {
+class GameManager {
     constructor() {
         this.board = Array(9).fill('');
         this.currentPlayer = 'X';
         this.gameActive = false;
         this.gameMode = 'human-vs-ai'; // 'human-vs-ai' or 'ai-vs-ai'
         this.autoPlay = false;
+        this.difficulty = 'hard'; // 'easy', 'medium', 'hard'
         
         // Statistics for AI vs AI
         this.stats = {
             aiXWins: 0,
             aiOWins: 0,
             ties: 0,
-            totalGames: 0
+            totalGames: 0,
+            playerWins: 0,
+            aiWins: 0
         };
         
+        this.aiPlayer = new AIPlayer();
         this.initializeElements();
-        this.initializeGame();
+        this.initializeEventListeners();
     }
 
     initializeElements() {
@@ -35,11 +39,17 @@ class TicTacToe {
         this.humanVsAiBtn = document.getElementById('humanVsAiBtn');
         this.aiVsAiBtn = document.getElementById('aiVsAiBtn');
         
+        // Difficulty buttons
+        this.easyBtn = document.getElementById('easyBtn');
+        this.mediumBtn = document.getElementById('mediumBtn');
+        this.hardBtn = document.getElementById('hardBtn');
+        
         // AI explanation
         this.aiExplanation = document.getElementById('aiExplanation');
         this.aiTitle = document.getElementById('aiTitle');
         this.explanationText = document.getElementById('explanationText');
         this.moveScore = document.getElementById('moveScore');
+        this.difficultyIndicator = document.getElementById('difficultyIndicator');
         
         // Stats
         this.aiStats = document.getElementById('aiStats');
@@ -47,22 +57,31 @@ class TicTacToe {
         this.aiOWinsEl = document.getElementById('aiOWins');
         this.tiesEl = document.getElementById('ties');
         this.totalGamesEl = document.getElementById('totalGames');
+        this.playerWinsEl = document.getElementById('playerWins');
+        this.aiWinsEl = document.getElementById('aiWins');
     }
 
-    initializeGame() {
-        // Add event listeners
+    initializeEventListeners() {
+        // Cell clicks
         this.cells.forEach((cell, index) => {
             cell.addEventListener('click', () => this.handleCellClick(index));
         });
         
+        // Control buttons
         this.resetBtn.addEventListener('click', () => this.resetGame());
         this.autoPlayBtn.addEventListener('click', () => this.toggleAutoPlay());
         this.stepBtn.addEventListener('click', () => this.makeNextAIMove());
         
+        // Mode buttons
         this.humanVsAiBtn.addEventListener('click', () => this.setGameMode('human-vs-ai'));
         this.aiVsAiBtn.addEventListener('click', () => this.setGameMode('ai-vs-ai'));
         
-        this.updateStatus('Choose game mode to start!');
+        // Difficulty buttons
+        this.easyBtn.addEventListener('click', () => this.setDifficulty('easy'));
+        this.mediumBtn.addEventListener('click', () => this.setDifficulty('medium'));
+        this.hardBtn.addEventListener('click', () => this.setDifficulty('hard'));
+        
+        this.updateStatus('Choose game mode and difficulty to start!');
     }
 
     setGameMode(mode) {
@@ -73,20 +92,61 @@ class TicTacToe {
         this.humanVsAiBtn.classList.toggle('active', mode === 'human-vs-ai');
         this.aiVsAiBtn.classList.toggle('active', mode === 'ai-vs-ai');
         
-        // Show/hide appropriate controls
+        // Show/hide appropriate controls and stats
+        const humanAiStats = document.querySelectorAll('.human-ai-stats');
+        const aiAiStats = document.querySelectorAll('.ai-ai-stats');
+        
         if (mode === 'ai-vs-ai') {
             this.autoPlayBtn.style.display = 'inline-block';
             this.stepBtn.style.display = 'inline-block';
             this.aiStats.style.display = 'block';
             this.playersInfo.textContent = 'AI X vs AI O';
+            
+            // Show AI vs AI stats, hide Human vs AI stats
+            humanAiStats.forEach(el => el.style.display = 'none');
+            aiAiStats.forEach(el => el.style.display = 'flex');
         } else {
             this.autoPlayBtn.style.display = 'none';
             this.stepBtn.style.display = 'none';
-            this.aiStats.style.display = 'none';
-            this.playersInfo.textContent = 'You: X | AI: O';
+            this.aiStats.style.display = 'block';
+            this.playersInfo.textContent = `You: X | AI: O (${this.difficulty.toUpperCase()})`;
+            
+            // Show Human vs AI stats, hide AI vs AI stats
+            humanAiStats.forEach(el => el.style.display = 'flex');
+            aiAiStats.forEach(el => el.style.display = 'none');
         }
         
         this.resetGame();
+    }
+
+    setDifficulty(difficulty) {
+        this.difficulty = difficulty;
+        this.aiPlayer.setDifficulty(difficulty);
+        
+        // Update difficulty buttons
+        this.easyBtn.classList.toggle('active', difficulty === 'easy');
+        this.mediumBtn.classList.toggle('active', difficulty === 'medium');
+        this.hardBtn.classList.toggle('active', difficulty === 'hard');
+        
+        // Update players info
+        if (this.gameMode === 'human-vs-ai') {
+            this.playersInfo.textContent = `You: X | AI: O (${difficulty.toUpperCase()})`;
+        }
+        
+        // Update difficulty indicator
+        this.difficultyIndicator.textContent = `Difficulty: ${difficulty.toUpperCase()}`;
+        
+        // If game is active, show difficulty change message
+        if (this.gameActive) {
+            this.updateStatus(`Difficulty changed to ${difficulty.toUpperCase()}! Current game continues.`);
+            setTimeout(() => {
+                if (this.gameMode === 'human-vs-ai' && this.currentPlayer === 'X') {
+                    this.updateStatus('Your turn!');
+                } else if (this.gameMode === 'ai-vs-ai') {
+                    this.updateStatus(`AI ${this.currentPlayer}'s turn`);
+                }
+            }, 2000);
+        }
     }
 
     handleCellClick(index) {
@@ -131,7 +191,7 @@ class TicTacToe {
     makeAIMove() {
         if (!this.gameActive) return;
 
-        const moveAnalysis = this.getBestMoveWithAnalysis(this.currentPlayer);
+        const moveAnalysis = this.aiPlayer.getBestMoveWithAnalysis(this.board, this.currentPlayer);
         this.makeMove(moveAnalysis.move, this.currentPlayer);
         
         this.explainAIMove(moveAnalysis, this.currentPlayer);
@@ -169,132 +229,6 @@ class TicTacToe {
         }
     }
 
-    getBestMoveWithAnalysis(player) {
-        let bestScore = player === 'O' ? -Infinity : Infinity;
-        let bestMove = 0;
-        let analysis = {
-            move: 0,
-            score: 0,
-            reasoning: '',
-            moveType: '',
-            alternatives: []
-        };
-
-        for (let i = 0; i < 9; i++) {
-            if (this.board[i] === '') {
-                this.board[i] = player;
-                let score = this.minimax(this.board, 0, player === 'X');
-                this.board[i] = '';
-                
-                analysis.alternatives.push({
-                    position: i,
-                    score: score,
-                    description: this.getPositionName(i)
-                });
-                
-                if ((player === 'O' && score > bestScore) || (player === 'X' && score < bestScore)) {
-                    bestScore = score;
-                    bestMove = i;
-                }
-            }
-        }
-
-        analysis.move = bestMove;
-        analysis.score = bestScore;
-        analysis.moveType = this.analyzeMoveType(bestMove, bestScore, player);
-        analysis.reasoning = this.generateReasoning(bestMove, bestScore, analysis.alternatives, player);
-
-        return analysis;
-    }
-
-    analyzeMoveType(move, score, player) {
-        // Check if this move wins the game
-        this.board[move] = player;
-        if (this.checkWinnerForBoard(this.board) === player) {
-            this.board[move] = '';
-            return 'winning';
-        }
-        this.board[move] = '';
-
-        // Check if this move blocks opponent win
-        const opponent = player === 'X' ? 'O' : 'X';
-        this.board[move] = opponent;
-        if (this.checkWinnerForBoard(this.board) === opponent) {
-            this.board[move] = '';
-            return 'blocking';
-        }
-        this.board[move] = '';
-
-        if (this.createsFork(move, player)) return 'fork';
-        if (this.createsFork(move, opponent)) return 'fork-block';
-
-        if (score > 0) return 'advantageous';
-        if (score === 0) return 'neutral';
-        return 'defensive';
-    }
-
-    createsFork(move, player) {
-        this.board[move] = player;
-        let winningMoves = 0;
-        
-        for (let i = 0; i < 9; i++) {
-            if (this.board[i] === '') {
-                this.board[i] = player;
-                if (this.checkWinnerForBoard(this.board) === player) {
-                    winningMoves++;
-                }
-                this.board[i] = '';
-            }
-        }
-        
-        this.board[move] = '';
-        return winningMoves >= 2;
-    }
-
-    generateReasoning(move, score, alternatives, player) {
-        const position = this.getPositionName(move);
-        const moveType = this.analyzeMoveType(move, score, player);
-        const playerName = this.gameMode === 'ai-vs-ai' ? `AI ${player}` : (player === 'O' ? 'AI' : 'You');
-
-        switch (moveType) {
-            case 'winning':
-                return `${playerName} chose ${position} to win the game! 🎉`;
-            
-            case 'blocking':
-                return `${playerName} chose ${position} to block the opponent's winning move.`;
-            
-            case 'fork':
-                return `${playerName} chose ${position} to create a fork - multiple ways to win!`;
-            
-            case 'fork-block':
-                return `${playerName} chose ${position} to prevent the opponent from creating a fork.`;
-            
-            case 'advantageous':
-                return `${playerName} chose ${position} for strategic advantage.`;
-            
-            case 'neutral':
-                if (move === 4 && this.board[4] === '') {
-                    return `${playerName} chose the center - the strongest strategic position.`;
-                }
-                if ([0, 2, 6, 8].includes(move)) {
-                    return `${playerName} chose the ${position} corner for strategic positioning.`;
-                }
-                return `${playerName} chose ${position} to maintain optimal defensive positioning.`;
-            
-            default:
-                return `${playerName} chose ${position} as the best defensive move available.`;
-        }
-    }
-
-    getPositionName(index) {
-        const positions = [
-            'top-left', 'top-center', 'top-right',
-            'middle-left', 'center', 'middle-right',
-            'bottom-left', 'bottom-center', 'bottom-right'
-        ];
-        return positions[index];
-    }
-
     explainAIMove(analysis, player) {
         const playerName = this.gameMode === 'ai-vs-ai' ? `AI ${player}` : 'AI';
         this.aiTitle.textContent = `🤖 ${playerName}'s Move:`;
@@ -313,43 +247,7 @@ class TicTacToe {
         this.aiExplanation.style.display = 'block';
     }
 
-    minimax(board, depth, isMaximizing) {
-        const winner = this.checkWinnerForBoard(board);
-        
-        if (winner === 'O') return 10 - depth;
-        if (winner === 'X') return depth - 10;
-        if (this.isBoardFullForBoard(board)) return 0;
-
-        if (isMaximizing) {
-            let bestScore = -Infinity;
-            for (let i = 0; i < 9; i++) {
-                if (board[i] === '') {
-                    board[i] = 'O';
-                    let score = this.minimax(board, depth + 1, false);
-                    board[i] = '';
-                    bestScore = Math.max(score, bestScore);
-                }
-            }
-            return bestScore;
-        } else {
-            let bestScore = Infinity;
-            for (let i = 0; i < 9; i++) {
-                if (board[i] === '') {
-                    board[i] = 'X';
-                    let score = this.minimax(board, depth + 1, true);
-                    board[i] = '';
-                    bestScore = Math.min(score, bestScore);
-                }
-            }
-            return bestScore;
-        }
-    }
-
     checkWinner() {
-        return this.checkWinnerForBoard(this.board);
-    }
-
-    checkWinnerForBoard(board) {
         const winPatterns = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
             [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
@@ -358,19 +256,15 @@ class TicTacToe {
 
         for (let pattern of winPatterns) {
             const [a, b, c] = pattern;
-            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                return board[a];
+            if (this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
+                return this.board[a];
             }
         }
         return null;
     }
 
     isBoardFull() {
-        return this.isBoardFullForBoard(this.board);
-    }
-
-    isBoardFullForBoard(board) {
-        return board.every(cell => cell !== '');
+        return this.board.every(cell => cell !== '');
     }
 
     endGame(result) {
@@ -378,9 +272,10 @@ class TicTacToe {
         this.autoPlay = false;
         this.autoPlayBtn.textContent = 'Auto Play';
         
-        // Update statistics for AI vs AI mode
+        // Update statistics
+        this.stats.totalGames++;
+        
         if (this.gameMode === 'ai-vs-ai') {
-            this.stats.totalGames++;
             if (result === 'X') {
                 this.stats.aiXWins++;
             } else if (result === 'O') {
@@ -388,14 +283,25 @@ class TicTacToe {
             } else {
                 this.stats.ties++;
             }
-            this.updateStats();
+        } else {
+            // Human vs AI mode
+            if (result === 'X') {
+                this.stats.playerWins++;
+            } else if (result === 'O') {
+                this.stats.aiWins++;
+            } else {
+                this.stats.ties++;
+            }
         }
         
+        this.updateStats();
+        
+        // Show appropriate message
         if (result === 'X') {
             const message = this.gameMode === 'ai-vs-ai' ? '🤖 AI X wins!' : '🎉 You won! Great job!';
             this.updateStatus(message, 'winner');
         } else if (result === 'O') {
-            const message = this.gameMode === 'ai-vs-ai' ? '🤖 AI O wins!' : '🤖 AI wins! The Minimax algorithm is unbeatable.';
+            const message = this.gameMode === 'ai-vs-ai' ? '🤖 AI O wins!' : `🤖 AI wins! ${this.getDifficultyMessage()}`;
             this.updateStatus(message, 'winner');
         } else {
             this.updateStatus('🤝 It\'s a tie! Perfect play from both sides!', 'tie');
@@ -409,9 +315,27 @@ class TicTacToe {
         }
     }
 
+    getDifficultyMessage() {
+        switch (this.difficulty) {
+            case 'easy':
+                return 'Try medium difficulty for a bigger challenge!';
+            case 'medium':
+                return 'Good game! Try hard mode for the ultimate challenge!';
+            case 'hard':
+                return 'The Minimax algorithm is unbeatable on hard mode!';
+            default:
+                return 'Good game!';
+        }
+    }
+
     updateStats() {
-        this.aiXWinsEl.textContent = this.stats.aiXWins;
-        this.aiOWinsEl.textContent = this.stats.aiOWins;
+        if (this.gameMode === 'ai-vs-ai') {
+            this.aiXWinsEl.textContent = this.stats.aiXWins;
+            this.aiOWinsEl.textContent = this.stats.aiOWins;
+        } else {
+            this.playerWinsEl.textContent = this.stats.playerWins;
+            this.aiWinsEl.textContent = this.stats.aiWins;
+        }
         this.tiesEl.textContent = this.stats.ties;
         this.totalGamesEl.textContent = this.stats.totalGames;
     }
@@ -447,5 +371,5 @@ class TicTacToe {
 
 // Initialize the game when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new TicTacToe();
+    new GameManager();
 });

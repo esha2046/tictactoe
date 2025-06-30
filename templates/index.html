@@ -3,23 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Tic-Tac-Toe - Enhanced with AI vs AI</title>
+    <title>AI Tic-Tac-Toe - Enhanced with Difficulty Levels</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>AI Tic-Tac-Toe</h1>
-        <p class="subtitle">Using Minimax Algorithm - Flask Edition</p>
+        <p class="subtitle">Using Minimax Algorithm with Difficulty Levels - Flask Edition</p>
         
         <!-- Game Mode Selection -->
         <div class="game-modes">
-            <button id="humanVsAiBtn" class="mode-btn active">Human vs AI</button>
+            <button id="humanVsAiBtn" class="mode-btn">Human vs AI</button>
             <button id="aiVsAiBtn" class="mode-btn">AI vs AI</button>
         </div>
 
+        <!-- Difficulty Selection -->
+        <div class="difficulty-selection">
+            <h3>Choose Difficulty:</h3>
+            <div class="difficulty-buttons">
+                <button id="easyBtn" class="difficulty-btn">Easy</button>
+                <button id="mediumBtn" class="difficulty-btn">Medium</button>
+                <button id="hardBtn" class="difficulty-btn active">Hard</button>
+            </div>
+            <p id="difficultyIndicator" class="difficulty-indicator">Difficulty: HARD</p>
+        </div>
+
         <div class="game-info">
-            <p id="status">Choose game mode to start!</p>
-            <p class="players" id="playersInfo">You: X | AI: O</p>
+            <p id="status">Choose game mode and difficulty to start!</p>
+            <p class="players" id="playersInfo">You: X | AI: O (HARD)</p>
         </div>
 
         <div class="game-board" id="gameBoard">
@@ -50,35 +61,57 @@
             </div>
         </div>
 
-        <!-- AI vs AI Stats -->
+        <!-- Game Statistics -->
         <div id="aiStats" class="ai-stats" style="display: none;">
-            <h3>🏆 Battle Statistics</h3>
+            <h3>🏆 Game Statistics</h3>
             <div class="stats-grid">
-                <div class="stat-item">
+                <!-- Human vs AI Stats -->
+                <div class="stat-item human-ai-stats">
+                    <span class="stat-label">Your Wins:</span>
+                    <span id="playerWins" class="stat-value">0</span>
+                </div>
+                <div class="stat-item human-ai-stats">
+                    <span class="stat-label">AI Wins:</span>
+                    <span id="aiWins" class="stat-value">0</span>
+                </div>
+                
+                <!-- AI vs AI Stats -->
+                <div class="stat-item ai-ai-stats" style="display: none;">
                     <span class="stat-label">AI X Wins:</span>
                     <span id="aiXWins" class="stat-value">0</span>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item ai-ai-stats" style="display: none;">
                     <span class="stat-label">AI O Wins:</span>
                     <span id="aiOWins" class="stat-value">0</span>
                 </div>
+                
+                <!-- Common Stats -->
                 <div class="stat-item">
                     <span class="stat-label">Ties:</span>
                     <span id="ties" class="stat-value">0</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Games:</span>
+                    <span class="stat-label">Total Games:</span>
                     <span id="totalGames" class="stat-value">0</span>
                 </div>
             </div>
         </div>
 
         <div class="info">
+            <h3>🎯 Difficulty Levels:</h3>
+            <ul class="difficulty-info">
+                <li><strong>Easy:</strong> AI makes mostly random moves with occasional strategic plays. Great for beginners!</li>
+                <li><strong>Medium:</strong> AI uses limited strategic thinking with some unpredictability. A balanced challenge.</li>
+                <li><strong>Hard:</strong> AI uses perfect Minimax algorithm. Unbeatable - best you can do is tie!</li>
+            </ul>
+            
             <p><strong>How it works:</strong> The AI uses the Minimax algorithm to calculate the best possible move by exploring all future game states. In AI vs AI mode, watch two perfect players battle it out!</p>
-            <p><strong>Flask Edition:</strong> Now powered by Flask backend with API endpoints ready for enhanced features!</p>
+            <p><strong>Flask Edition:</strong> Now powered by Flask backend with modular JavaScript architecture!</p>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Load JavaScript modules -->
+    <script src="{{ url_for('static', filename='AI-player.js') }}"></script>
+    <script src="{{ url_for('static', filename='Game.js') }}"></script>
 </body>
 </html>
