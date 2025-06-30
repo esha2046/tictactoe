@@ -407,4 +407,215 @@ document.addEventListener('DOMContentLoaded', function () {
             return { score: bestScore, move: bestMove };
         }
     }
+
+    // Minimax pseudocode as array of lines for highlighting
+    const minimaxPseudocodeLines = [
+        'function minimax(board, isMaximizing):',
+        '    if game is over:',
+        '        return score',
+        '    if isMaximizing:',
+        '        bestScore = -infinity',
+        '        for each possible move:',
+        '            make move',
+        '            score = minimax(new board, false)',
+        '            undo move',
+        '            bestScore = max(score, bestScore)',
+        '        return bestScore',
+        '    else:',
+        '        bestScore = +infinity',
+        '        for each possible move:',
+        '            make move',
+        '            score = minimax(new board, true)',
+        '            undo move',
+        '            bestScore = min(score, bestScore)',
+        '        return bestScore'
+    ];
+    const showMinimaxBtn = document.getElementById('showMinimaxBtn');
+    const minimaxPseudocodeBox = document.getElementById('minimaxPseudocode');
+    const minimaxDemoArea = document.getElementById('minimaxDemoArea');
+    const minimaxDemoBoard = document.getElementById('minimaxDemoBoard');
+    const minimaxDemoStatus = document.getElementById('minimaxDemoStatus');
+    const minimaxNextBtn = document.getElementById('minimaxNextBtn');
+    const minimaxResetBtn = document.getElementById('minimaxResetBtn');
+
+    // Demo board state (classic mid-game)
+    const minimaxDemoStart = ['X', 'O', 'X', ' ', 'O', ' ', ' ', ' ', ' '];
+
+    // Minimax stepper state
+    let minimaxStepper = null;
+
+    function renderMinimaxPseudocode(currentLine) {
+        minimaxPseudocodeBox.innerHTML = minimaxPseudocodeLines.map((line, i) =>
+            `<span class="${i === currentLine ? 'highlight-line' : ''}">${line}</span>`
+        ).join('<br>');
+    }
+    function renderMinimaxDemoBoard(board) {
+        minimaxDemoBoard.innerHTML = '';
+        for (let i = 0; i < 9; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'cell';
+            btn.textContent = board[i] === ' ' ? '' : board[i];
+            btn.disabled = true;
+            minimaxDemoBoard.appendChild(btn);
+        }
+    }
+    // Simple stepper for demo: walks through the main lines
+    function MinimaxStepper() {
+        this.board = minimaxDemoStart.slice();
+        this.isMaximizing = true;
+        this.line = 0;
+        this.done = false;
+        this.stack = [];
+        this.status = 'Starting Minimax on this board (AI = O, maximizing)';
+    }
+    MinimaxStepper.prototype.next = function() {
+        if (this.done) return;
+        switch (this.line) {
+            case 0:
+                this.status = 'Call minimax(board, isMaximizing)';
+                this.line = 1;
+                break;
+            case 1:
+                // Check for terminal state
+                let winner = checkWinner(this.board);
+                if (winner) {
+                    this.status = `Game over: ${winner === 'T' ? 'Tie' : winner + ' wins'} → return score`;
+                    this.line = 2;
+                } else {
+                    this.status = 'Game not over, continue.';
+                    this.line = 3;
+                }
+                break;
+            case 2:
+                this.status = 'Return score (1 for O win, -1 for X win, 0 for tie)';
+                this.done = true;
+                break;
+            case 3:
+                if (this.isMaximizing) {
+                    this.status = 'Maximizing: set bestScore = -infinity';
+                    this.line = 4;
+                } else {
+                    this.status = 'Minimizing: set bestScore = +infinity';
+                    this.line = 11;
+                }
+                break;
+            case 4:
+                this.status = 'For each possible move (empty cell)...';
+                this.moves = availableMoves(this.board);
+                this.moveIdx = 0;
+                this.line = 5;
+                break;
+            case 5:
+                if (this.moveIdx >= this.moves.length) {
+                    this.line = 9;
+                } else {
+                    this.status = `Trying move at cell ${this.moves[this.moveIdx]}`;
+                    this.line = 6;
+                }
+                break;
+            case 6:
+                this.status = `Make move O at cell ${this.moves[this.moveIdx]}`;
+                this.board[this.moves[this.moveIdx]] = 'O';
+                this.line = 7;
+                break;
+            case 7:
+                this.status = 'Recursively call minimax(new board, false)';
+                this.stack.push({board: this.board.slice(), isMaximizing: false, line: 8, moveIdx: this.moveIdx});
+                this.board = this.board.slice();
+                this.isMaximizing = false;
+                this.line = 0;
+                break;
+            case 8:
+                // After recursion, undo move
+                this.status = `Undo move at cell ${this.moves[this.moveIdx]}`;
+                this.board[this.moves[this.moveIdx]] = ' ';
+                this.moveIdx++;
+                this.line = 5;
+                break;
+            case 9:
+                this.status = 'Return bestScore (max of all moves)';
+                this.done = true;
+                break;
+            // Minimizing branch
+            case 11:
+                this.status = 'For each possible move (empty cell)...';
+                this.moves = availableMoves(this.board);
+                this.moveIdx = 0;
+                this.line = 12;
+                break;
+            case 12:
+                if (this.moveIdx >= this.moves.length) {
+                    this.line = 16;
+                } else {
+                    this.status = `Trying move at cell ${this.moves[this.moveIdx]}`;
+                    this.line = 13;
+                }
+                break;
+            case 13:
+                this.status = `Make move X at cell ${this.moves[this.moveIdx]}`;
+                this.board[this.moves[this.moveIdx]] = 'X';
+                this.line = 14;
+                break;
+            case 14:
+                this.status = 'Recursively call minimax(new board, true)';
+                this.stack.push({board: this.board.slice(), isMaximizing: true, line: 15, moveIdx: this.moveIdx});
+                this.board = this.board.slice();
+                this.isMaximizing = true;
+                this.line = 0;
+                break;
+            case 15:
+                // After recursion, undo move
+                this.status = `Undo move at cell ${this.moves[this.moveIdx]}`;
+                this.board[this.moves[this.moveIdx]] = ' ';
+                this.moveIdx++;
+                this.line = 12;
+                break;
+            case 16:
+                this.status = 'Return bestScore (min of all moves)';
+                this.done = true;
+                break;
+            default:
+                this.status = 'Done.';
+                this.done = true;
+        }
+    };
+    MinimaxStepper.prototype.reset = function() {
+        this.board = minimaxDemoStart.slice();
+        this.isMaximizing = true;
+        this.line = 0;
+        this.done = false;
+        this.stack = [];
+        this.status = 'Starting Minimax on this board (AI = O, maximizing)';
+    };
+
+    // Minimax demo logic
+    showMinimaxBtn.addEventListener('click', function () {
+        if (minimaxPseudocodeBox.style.display === 'none') {
+            renderMinimaxPseudocode(0);
+            minimaxPseudocodeBox.style.display = 'block';
+            showMinimaxBtn.textContent = 'Hide Minimax Demo';
+            minimaxDemoArea.style.display = 'block';
+            minimaxStepper = new MinimaxStepper();
+            renderMinimaxDemoBoard(minimaxStepper.board);
+            minimaxDemoStatus.textContent = minimaxStepper.status;
+        } else {
+            minimaxPseudocodeBox.style.display = 'none';
+            showMinimaxBtn.textContent = 'Show Minimax Demo';
+            minimaxDemoArea.style.display = 'none';
+        }
+    });
+    minimaxNextBtn.addEventListener('click', function () {
+        if (!minimaxStepper) return;
+        minimaxStepper.next();
+        renderMinimaxPseudocode(minimaxStepper.line);
+        renderMinimaxDemoBoard(minimaxStepper.board);
+        minimaxDemoStatus.textContent = minimaxStepper.status;
+    });
+    minimaxResetBtn.addEventListener('click', function () {
+        if (!minimaxStepper) return;
+        minimaxStepper.reset();
+        renderMinimaxPseudocode(minimaxStepper.line);
+        renderMinimaxDemoBoard(minimaxStepper.board);
+        minimaxDemoStatus.textContent = minimaxStepper.status;
+    });
 }); 

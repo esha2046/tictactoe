@@ -166,6 +166,15 @@
             </div>
             <button id="rlResetGameBtn" class="reset-btn" style="margin-top: 12px;">Reset Board</button>
         </div>
+        <!-- Minimax Demo Button and Pseudocode -->
+        <button id="showMinimaxBtn" class="tree-btn" style="margin-bottom: 10px;">Show Minimax Demo</button>
+        <pre id="minimaxPseudocode" class="minimax-pseudocode" style="display:none; text-align:left; margin: 0 auto 16px auto; max-width: 420px; background: #f8f9fa; border: 1px solid #bdc3c7; border-radius: 6px; padding: 14px; font-size: 1em; color: #2c3e50;"></pre>
+        <div id="minimaxDemoArea" style="display:none; margin-bottom: 18px;">
+            <div class="game-board rl-board" id="minimaxDemoBoard" style="margin: 0 auto 10px auto;"></div>
+            <div id="minimaxDemoStatus" style="margin: 8px 0 10px 0; font-size: 1em; color: #34495e;"></div>
+            <button id="minimaxNextBtn" class="tree-btn">Next Step</button>
+            <button id="minimaxResetBtn" class="reset-btn" style="margin-left: 10px;">Reset Demo</button>
+        </div>
         <div class="rl-controls">
             <button id="startRLBtn">Start Training (Auto-Play)</button>
             <button id="stopRLBtn" style="display:none;">Stop Training</button>
