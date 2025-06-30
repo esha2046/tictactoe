@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tic-Tac-Toe - Enhanced with AI vs AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Tic-Tac-Toe</h1>
+        <p class="subtitle">Using Minimax Algorithm - Flask Edition</p>
+        
+        <!-- Game Mode Selection -->
+        <div class="game-modes">
+            <button id="humanVsAiBtn" class="mode-btn active">Human vs AI</button>
+            <button id="aiVsAiBtn" class="mode-btn">AI vs AI</button>
+        </div>
+
+        <div class="game-info">
+            <p id="status">Choose game mode to start!</p>
+            <p class="players" id="playersInfo">You: X | AI: O</p>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <button class="cell" data-index="0"></button>
+            <button class="cell" data-index="1"></button>
+            <button class="cell" data-index="2"></button>
+            <button class="cell" data-index="3"></button>
+            <button class="cell" data-index="4"></button>
+            <button class="cell" data-index="5"></button>
+            <button class="cell" data-index="6"></button>
+            <button class="cell" data-index="7"></button>
+            <button class="cell" data-index="8"></button>
+        </div>
+
+        <div class="controls">
+            <button id="resetBtn" class="reset-btn">New Game</button>
+            <button id="autoPlayBtn" class="auto-play-btn" style="display: none;">Auto Play</button>
+            <button id="stepBtn" class="step-btn" style="display: none;">Next Move</button>
+        </div>
+
+        <div id="aiExplanation" class="ai-explanation" style="display: none;">
+            <h3 id="aiTitle">🤖 Why AI Chose This Move:</h3>
+            <p id="explanationText"></p>
+            <div class="move-analysis">
+                <div class="score-info">
+                    <span id="moveScore"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI vs AI Stats -->
+        <div id="aiStats" class="ai-stats" style="display: none;">
+            <h3>🏆 Battle Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">AI X Wins:</span>
+                    <span id="aiXWins" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">AI O Wins:</span>
+                    <span id="aiOWins" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ties:</span>
+                    <span id="ties" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Games:</span>
+                    <span id="totalGames" class="stat-value">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info">
+            <p><strong>How it works:</strong> The AI uses the Minimax algorithm to calculate the best possible move by exploring all future game states. In AI vs AI mode, watch two perfect players battle it out!</p>
+            <p><strong>Flask Edition:</strong> Now powered by Flask backend with API endpoints ready for enhanced features!</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
