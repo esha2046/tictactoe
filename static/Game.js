@@ -20,6 +20,7 @@ class GameManager {
         };
         
         this.aiPlayer = new AIPlayer();
+        this.moveTreeVisualizer = new MoveTreeVisualizer();
         this.initializeElements();
         this.initializeEventListeners();
     }
@@ -192,15 +193,17 @@ class GameManager {
         if (!this.gameActive) return;
 
         const moveAnalysis = this.aiPlayer.getBestMoveWithAnalysis(this.board, this.currentPlayer);
-        this.makeMove(moveAnalysis.move, this.currentPlayer);
         
+        // Generate move tree visualization
+        this.moveTreeVisualizer.generateTree(this.board, this.currentPlayer, moveAnalysis.move);
+        
+        this.makeMove(moveAnalysis.move, this.currentPlayer);
         this.explainAIMove(moveAnalysis, this.currentPlayer);
         
         if (this.gameActive) {
             if (this.gameMode === 'human-vs-ai') {
                 this.updateStatus('Your turn!');
             } else {
-                // AI vs AI mode
                 const nextPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
                 this.updateStatus(`AI ${nextPlayer}'s turn`);
                 

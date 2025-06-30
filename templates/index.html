@@ -61,6 +61,15 @@
             </div>
         </div>
 
+        <div id="moveTreeSection" class="move-tree-section" style="display: none;">
+            <h3>🌳 AI Decision Tree</h3>
+            <div class="tree-controls">
+                <button id="toggleTreeBtn" class="tree-btn">Show Tree</button>
+                <span class="tree-depth">Depth: <span id="currentDepth">2</span></span>
+            </div>
+            <div id="moveTree" class="move-tree"></div>
+        </div>
+
         <!-- Game Statistics -->
         <div id="aiStats" class="ai-stats" style="display: none;">
             <h3>🏆 Game Statistics</h3>
@@ -113,5 +122,6 @@
     <!-- Load JavaScript modules -->
     <script src="{{ url_for('static', filename='AI-player.js') }}"></script>
     <script src="{{ url_for('static', filename='Game.js') }}"></script>
+    <script src="{{ url_for('static', filename='MoveTree.js') }}"></script>
 </body>
 </html>

@@ -457,3 +457,128 @@ h1 {
         grid-template-columns: 1fr;
     }
 }
+
+/* Move Tree Visualization Styles */
+.move-tree-section {
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 5px solid #3498db;
+}
+
+.move-tree-section h3 {
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.tree-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.tree-btn {
+    padding: 8px 16px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.tree-btn:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
+.tree-depth {
+    color: #666;
+    font-weight: bold;
+}
+
+.move-tree {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    min-height: 150px;
+    overflow-x: auto;
+}
+
+.tree-node {
+    display: inline-block;
+    margin: 5px;
+    text-align: center;
+    vertical-align: top;
+}
+
+.node-content {
+    background: #f8f9fa;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    min-width: 60px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.node-content:hover {
+    border-color: #3498db;
+    transform: scale(1.05);
+}
+
+.node-content.best-move {
+    border-color: #27ae60;
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.node-content.current-move {
+    border-color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.node-position {
+    font-size: 0.8em;
+    color: #666;
+    margin-bottom: 3px;
+}
+
+.node-score {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.node-score.positive {
+    color: #27ae60;
+}
+
+.node-score.negative {
+    color: #e74c3c;
+}
+
+.tree-level {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.tree-connections {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+    margin: 5px 0;
+}
+
+.connection-line {
+    width: 2px;
+    height: 15px;
+    background: #bdc3c7;
+    margin: 0 10px;
+}
