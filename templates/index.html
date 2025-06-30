@@ -3,119 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Tic-Tac-Toe - Enhanced with Difficulty Levels</title>
+    <title>AI Tic-Tac-Toe - Desktop Edition</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>AI Tic-Tac-Toe</h1>
-        <p class="subtitle">Using Minimax Algorithm with Difficulty Levels - Flask Edition</p>
-        
-        <!-- Game Mode Selection -->
-        <div class="game-modes">
-            <button id="humanVsAiBtn" class="mode-btn">Human vs AI</button>
-            <button id="aiVsAiBtn" class="mode-btn">AI vs AI</button>
+        <!-- Header -->
+        <div class="header">
+            <h1>AI Tic-Tac-Toe</h1>
+            <p class="subtitle">Minimax Algorithm with Multiple Difficulty Levels - Flask Desktop Edition</p>
         </div>
 
-        <!-- Difficulty Selection -->
-        <div class="difficulty-selection">
-            <h3>Choose Difficulty:</h3>
-            <div class="difficulty-buttons">
-                <button id="easyBtn" class="difficulty-btn">Easy</button>
-                <button id="mediumBtn" class="difficulty-btn">Medium</button>
-                <button id="hardBtn" class="difficulty-btn active">Hard</button>
-            </div>
-            <p id="difficultyIndicator" class="difficulty-indicator">Difficulty: HARD</p>
-        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Game Board -->
+            <div class="game-panel">
+                <div class="game-info">
+                    <p id="status">Choose game mode and difficulty to start!</p>
+                    <p class="players" id="playersInfo">You: X | AI: O (HARD)</p>
+                </div>
 
-        <div class="game-info">
-            <p id="status">Choose game mode and difficulty to start!</p>
-            <p class="players" id="playersInfo">You: X | AI: O (HARD)</p>
-        </div>
+                <div class="game-board" id="gameBoard">
+                    <button class="cell" data-index="0"></button>
+                    <button class="cell" data-index="1"></button>
+                    <button class="cell" data-index="2"></button>
+                    <button class="cell" data-index="3"></button>
+                    <button class="cell" data-index="4"></button>
+                    <button class="cell" data-index="5"></button>
+                    <button class="cell" data-index="6"></button>
+                    <button class="cell" data-index="7"></button>
+                    <button class="cell" data-index="8"></button>
+                </div>
 
-        <div class="game-board" id="gameBoard">
-            <button class="cell" data-index="0"></button>
-            <button class="cell" data-index="1"></button>
-            <button class="cell" data-index="2"></button>
-            <button class="cell" data-index="3"></button>
-            <button class="cell" data-index="4"></button>
-            <button class="cell" data-index="5"></button>
-            <button class="cell" data-index="6"></button>
-            <button class="cell" data-index="7"></button>
-            <button class="cell" data-index="8"></button>
-        </div>
-
-        <div class="controls">
-            <button id="resetBtn" class="reset-btn">New Game</button>
-            <button id="autoPlayBtn" class="auto-play-btn" style="display: none;">Auto Play</button>
-            <button id="stepBtn" class="step-btn" style="display: none;">Next Move</button>
-        </div>
-
-        <div id="aiExplanation" class="ai-explanation" style="display: none;">
-            <h3 id="aiTitle">🤖 Why AI Chose This Move:</h3>
-            <p id="explanationText"></p>
-            <div class="move-analysis">
-                <div class="score-info">
-                    <span id="moveScore"></span>
+                <div class="controls">
+                    <button id="resetBtn" class="reset-btn">New Game</button>
+                    <button id="autoPlayBtn" class="auto-play-btn" style="display: none;">Auto Play</button>
+                    <button id="stepBtn" class="step-btn" style="display: none;">Next Move</button>
                 </div>
             </div>
-        </div>
 
-        <div id="moveTreeSection" class="move-tree-section" style="display: none;">
-            <h3>🌳 AI Decision Tree</h3>
-            <div class="tree-controls">
-                <button id="toggleTreeBtn" class="tree-btn">Show Tree</button>
-                <span class="tree-depth">Depth: <span id="currentDepth">2</span></span>
+            <!-- Middle Panel - Controls & AI Analysis -->
+            <div class="control-panel">
+                <!-- Game Mode Selection -->
+                <div class="panel-section">
+                    <h3>Game Mode</h3>
+                    <div class="game-modes">
+                        <button id="humanVsAiBtn" class="mode-btn">Human vs AI</button>
+                        <button id="aiVsAiBtn" class="mode-btn">AI vs AI</button>
+                    </div>
+                </div>
+
+                <!-- Difficulty Selection -->
+                <div class="panel-section">
+                    <h3>Difficulty Level</h3>
+                    <div class="difficulty-buttons">
+                        <button id="easyBtn" class="difficulty-btn">Easy</button>
+                        <button id="mediumBtn" class="difficulty-btn">Medium</button>
+                        <button id="hardBtn" class="difficulty-btn active">Hard</button>
+                    </div>
+                    <p id="difficultyIndicator" class="difficulty-indicator">Difficulty: HARD</p>
+                </div>
+
+                <!-- AI Move Analysis -->
+                <div id="aiExplanation" class="ai-explanation" style="display: none;">
+                    <h3 id="aiTitle">AI Move Analysis</h3>
+                    <p id="explanationText"></p>
+                    <div class="move-analysis">
+                        <div class="score-info">
+                            <span id="moveScore"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Move Tree Visualization -->
+                <div id="moveTreeSection" class="move-tree-section" style="display: none;">
+                    <h3>Decision Tree</h3>
+                    <div class="tree-controls">
+                        <button id="toggleTreeBtn" class="tree-btn">Show Tree</button>
+                        <span class="tree-depth">Depth: <span id="currentDepth">2</span></span>
+                    </div>
+                    <div id="moveTree" class="move-tree"></div>
+                </div>
             </div>
-            <div id="moveTree" class="move-tree"></div>
-        </div>
 
-        <!-- Game Statistics -->
-        <div id="aiStats" class="ai-stats" style="display: none;">
-            <h3>🏆 Game Statistics</h3>
-            <div class="stats-grid">
-                <!-- Human vs AI Stats -->
-                <div class="stat-item human-ai-stats">
-                    <span class="stat-label">Your Wins:</span>
-                    <span id="playerWins" class="stat-value">0</span>
+            <!-- Right Panel - Statistics & Information -->
+            <div class="info-panel">
+                <!-- Game Statistics -->
+                <div id="aiStats" class="ai-stats" style="display: none;">
+                    <h3>Game Statistics</h3>
+                    <div class="stats-grid">
+                        <!-- Human vs AI Stats -->
+                        <div class="stat-item human-ai-stats">
+                            <span class="stat-label">Your Wins</span>
+                            <span id="playerWins" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item human-ai-stats">
+                            <span class="stat-label">AI Wins</span>
+                            <span id="aiWins" class="stat-value">0</span>
+                        </div>
+                        
+                        <!-- AI vs AI Stats -->
+                        <div class="stat-item ai-ai-stats" style="display: none;">
+                            <span class="stat-label">AI X Wins</span>
+                            <span id="aiXWins" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item ai-ai-stats" style="display: none;">
+                            <span class="stat-label">AI O Wins</span>
+                            <span id="aiOWins" class="stat-value">0</span>
+                        </div>
+                        
+                        <!-- Common Stats -->
+                        <div class="stat-item">
+                            <span class="stat-label">Ties</span>
+                            <span id="ties" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Games</span>
+                            <span id="totalGames" class="stat-value">0</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-item human-ai-stats">
-                    <span class="stat-label">AI Wins:</span>
-                    <span id="aiWins" class="stat-value">0</span>
-                </div>
-                
-                <!-- AI vs AI Stats -->
-                <div class="stat-item ai-ai-stats" style="display: none;">
-                    <span class="stat-label">AI X Wins:</span>
-                    <span id="aiXWins" class="stat-value">0</span>
-                </div>
-                <div class="stat-item ai-ai-stats" style="display: none;">
-                    <span class="stat-label">AI O Wins:</span>
-                    <span id="aiOWins" class="stat-value">0</span>
-                </div>
-                
-                <!-- Common Stats -->
-                <div class="stat-item">
-                    <span class="stat-label">Ties:</span>
-                    <span id="ties" class="stat-value">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Total Games:</span>
-                    <span id="totalGames" class="stat-value">0</span>
+
+                <!-- Information Section -->
+                <div class="info">
+                    <h3>Difficulty Levels</h3>
+                    <ul class="difficulty-info">
+                        <li><strong>Easy:</strong> AI makes mostly random moves with occasional strategic plays. Great for beginners!</li>
+                        <li><strong>Medium:</strong> AI uses limited strategic thinking with some unpredictability. A balanced challenge.</li>
+                        <li><strong>Hard:</strong> AI uses perfect Minimax algorithm. Unbeatable - best you can do is tie!</li>
+                    </ul>
+                    
+                    <p><strong>How it works:</strong> The AI uses the Minimax algorithm to calculate the best possible move by exploring all future game states. The algorithm ensures optimal play by considering all possible outcomes.</p>
+                    
+                    <p><strong>AI vs AI Mode:</strong> Watch two AI players with perfect strategy battle it out. Since both use optimal play, every game should end in a tie!</p>
+                    
+                    <p><strong>Desktop Edition:</strong> Enhanced Flask-powered version with modular JavaScript architecture and real-time move analysis.</p>
                 </div>
             </div>
-        </div>
-
-        <div class="info">
-            <h3>🎯 Difficulty Levels:</h3>
-            <ul class="difficulty-info">
-                <li><strong>Easy:</strong> AI makes mostly random moves with occasional strategic plays. Great for beginners!</li>
-                <li><strong>Medium:</strong> AI uses limited strategic thinking with some unpredictability. A balanced challenge.</li>
-                <li><strong>Hard:</strong> AI uses perfect Minimax algorithm. Unbeatable - best you can do is tie!</li>
-            </ul>
-            
-            <p><strong>How it works:</strong> The AI uses the Minimax algorithm to calculate the best possible move by exploring all future game states. In AI vs AI mode, watch two perfect players battle it out!</p>
-            <p><strong>Flask Edition:</strong> Now powered by Flask backend with modular JavaScript architecture!</p>
         </div>
     </div>
 
