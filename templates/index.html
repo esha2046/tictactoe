@@ -12,6 +12,8 @@
         <div class="header">
             <h1>AI Tic-Tac-Toe</h1>
             <p class="subtitle">Minimax Algorithm with Multiple Difficulty Levels - Flask Desktop Edition</p>
+            <!-- RL Learning Button -->
+            <button id="rlTab" class="rl-tab-btn">Watch how AI eventually learns from your moves</button>
         </div>
 
         <!-- Main Content -->
@@ -143,9 +145,43 @@
         </div>
     </div>
 
+    <!-- RL Learning Section (Initially Hidden) -->
+    <div id="rlSection" class="rl-section" style="display: none;">
+        <button id="backToGameBtn" class="back-btn">&larr; Back to Game</button>
+        <h2>Watch how AI eventually learns from your moves</h2>
+        <p>Play against the RL agent. The AI will learn from your moves and improve over time!</p>
+        <!-- RL Tic-Tac-Toe Board -->
+        <div class="rl-game-board-container">
+            <div id="rlStatusMsg" class="rl-status-msg">Your turn! (You are X)</div>
+            <div class="game-board rl-board" id="rlGameBoard">
+                <button class="cell" data-index="0"></button>
+                <button class="cell" data-index="1"></button>
+                <button class="cell" data-index="2"></button>
+                <button class="cell" data-index="3"></button>
+                <button class="cell" data-index="4"></button>
+                <button class="cell" data-index="5"></button>
+                <button class="cell" data-index="6"></button>
+                <button class="cell" data-index="7"></button>
+                <button class="cell" data-index="8"></button>
+            </div>
+            <button id="rlResetGameBtn" class="reset-btn" style="margin-top: 12px;">Reset Board</button>
+        </div>
+        <div class="rl-controls">
+            <button id="startRLBtn">Start Training (Auto-Play)</button>
+            <button id="stopRLBtn" style="display:none;">Stop Training</button>
+            <span id="rlStatus"></span>
+        </div>
+        <div class="rl-visualization">
+            <canvas id="rlChart" width="400" height="200"></canvas>
+            <div id="rlGamePlayback"></div>
+        </div>
+    </div>
+
     <!-- Load JavaScript modules -->
     <script src="{{ url_for('static', filename='AI-player.js') }}"></script>
     <script src="{{ url_for('static', filename='Game.js') }}"></script>
     <script src="{{ url_for('static', filename='MoveTree.js') }}"></script>
+    <!-- RL Agent Script (to be created) -->
+    <script src="{{ url_for('static', filename='RLAgent.js') }}"></script>
 </body>
 </html>
